@@ -17,7 +17,7 @@
 
 umask 0022
 
-install_packages="postfix postfix-pcre dovecot-imapd dovecot-pop3d dovecot-sieve opendkim opendkim-tools spamassassin spamc net-tools fail2ban bind9-host"
+install_packages="postfix postfix-pcre dovecot-imapd dovecot-pop3d dovecot-sieve opendkim opendkim-tools spamassassin spamc net-tools bind9-host"
 
 systemctl -q stop dovecot
 systemctl -q stop postfix
@@ -32,7 +32,7 @@ certdir="/etc/letsencrypt/live/$maildomain"
 selfsigned="no" # yes no
 allow_suboptimal_ciphers="yes" #yes no
 mailbox_format="maildir" # maildir sdbox
-allowed_protocols=" imap pop3 "  #imap pop3
+allowed_protocols="imap pop3"  #imap pop3
 
 use_cert_config="no"
 country_name="" # IT US UK IN etc etc
@@ -385,18 +385,6 @@ postconf -e 'smtpd_forbid_bare_newline_exclusions = $mynetworks'
 /lib/opendkim/opendkim.service.generate
 systemctl daemon-reload
 
-# Enable fail2ban security for dovecot and postfix.
-[ ! -f /etc/fail2ban/jail.d/emailwiz.local ] && echo "[postfix]
-enabled = true
-[postfix-sasl]
-enabled = true
-[sieve]
-enabled = true
-[dovecot]
-enabled = true" > /etc/fail2ban/jail.d/emailwiz.local
-
-sed -i "s|^backend = auto$|backend = systemd|" /etc/fail2ban/jail.conf
-
 # Enable SpamAssassin update cronjob.
 if [ -f /etc/default/spamassassin ]
 then
@@ -414,7 +402,7 @@ else
 	printf "!!! Neither /etc/default/spamassassin or /etc/default/spamd exists, this is unexpected and needs to be investigated"
 fi
 
-for x in opendkim dovecot postfix fail2ban; do
+for x in opendkim dovecot postfix; do
 	printf "Restarting %s..." "$x"
 	service "$x" restart && printf " ...done\\n"
 	systemctl enable "$x"
