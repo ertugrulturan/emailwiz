@@ -7,7 +7,7 @@ I've linked this file on Github to a shorter, more memorable address on my
 website so you can get it on your machine with this short command:
 
 ```sh
-curl -LO lukesmith.xyz/emailwiz.sh
+curl -LO https://raw.githubusercontent.com/ertugrulturan/emailwiz/refs/heads/master/emailwiz.sh
 ```
 
 When prompted by a dialog menu at the beginning, select "Internet Site", then
@@ -24,7 +24,6 @@ sizeable network of people with email servers thanks to this script.
 - **Spamassassin** to prevent spam and allow you to make custom filters.
 - **OpenDKIM** to validate you so you can send to Gmail and other big sites.
 - **Certbot** SSL certificates, if not already present.
-- **fail2ban** to increase server security, with enabled modules for the above
   programs.
 
 ## This script does _not_...
@@ -112,9 +111,9 @@ to log in remotely though:
 Let's say you want to access your mail with Thunderbird or mutt or another
 email program. For my domain, the server information will be as follows:
 
-- SMTP server: `mail.lukesmith.xyz`
+- SMTP server: `mail.layerweb.com.tr`
 - SMTP port: 465
-- IMAP server: `mail.lukesmith.xyz`
+- IMAP server: `mail.layerweb.com.tr`
 - IMAP port: 993
 
 ## Benefited from this?
@@ -122,8 +121,7 @@ email program. For my domain, the server information will be as follows:
 I am always glad to hear this script is still making life easy for people. If
 this script or documentation has saved you some frustration, donate here:
 
-- btc: `bc1qzw6mk80t3vrp2cugmgfjqgtgzhldrqac5axfh4`
-- xmr: `8A5v4Ci11Lz7BDoE2z2oPqMoNHzr5Zj8B3Q2N2qzqrUKhAKgNQYGSSaZDnBUWg6iXCiZyvC9mVCyGj5kGMJTi1zGKGM4Trm`
+- xmr: `4A6A2JBrBKSa7XF5AWTZqjZ1tBv65yRYVNWVbkT4nvxogNXJW8RA6eASB7w1WhihfJLnztcLHqSZgT8yL9ovTW9v1JExvjC`
 
 ## Sites for Troubleshooting
 
@@ -134,3 +132,4 @@ Can't send or receive mail? Getting marked as spam? There are tools to double-ch
 - [Test your TXT records via mail](https://appmaildev.com/en/dkim)
 - [Is your IP blacklisted?](https://mxtoolbox.com/blacklists.aspx)
 - [mxtoolbox](https://mxtoolbox.com/SuperTool.aspx)
+- [Check mail spam test](https://www.mail-tester.com/)
