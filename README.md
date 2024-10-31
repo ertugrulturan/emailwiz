@@ -11,7 +11,7 @@ curl -LO https://raw.githubusercontent.com/ertugrulturan/emailwiz/refs/heads/mas
 ```
 
 When prompted by a dialog menu at the beginning, select "Internet Site", then
-give your full domain without any subdomain, e.g. `lukesmith.xyz`.
+give your full domain without any subdomain, e.g. `layerweb.com.tr`.
 
 I'm glad to say that dozens, hundreds of people have now used it and there is a
 sizeable network of people with email servers thanks to this script.
