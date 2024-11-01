@@ -17,7 +17,7 @@
 
 umask 0022
 
-install_packages="postfix postfix-pcre dovecot-imapd dovecot-pop3d dovecot-sieve opendkim opendkim-tools spamassassin spamc net-tools bind9-host"
+install_packages="postfix postfix-pcre dovecot-imapd dovecot-pop3d dovecot-sieve opendkim opendkim-tools net-tools bind9-host"
 
 systemctl -q stop dovecot
 systemctl -q stop postfix
@@ -32,10 +32,10 @@ certdir="/etc/letsencrypt/live/$maildomain"
 selfsigned="no" # yes no
 allow_suboptimal_ciphers="yes" #yes no
 mailbox_format="maildir" # maildir sdbox
-allowed_protocols="imap pop3"  #imap pop3
+allowed_protocols="imap"  #imap pop3
 
 use_cert_config="no"
-country_name="" # IT US UK IN etc etc
+country_name="TR" # IT US UK IN etc etc
 state_or_province_name=""
 organization_name=""
 common_name="$( hostname -f )"
@@ -189,9 +189,8 @@ echo "Configuring Postfix's master.cf..."
 sed -i '/^\s*-o/d;/^\s*submission/d;/^\s*smtp/d' /etc/postfix/master.cf
 
 echo "smtp unix - - n - - smtp
-smtp inet n - y - - smtpd
-  -o content_filter=spamassassin
-submission inet n       -       y       -       -       smtpd
+echo "smtp      unix  -       -       n       -       -       smtp
+smtp      inet  n       -       y       -       -       smtpd
   -o syslog_name=postfix/submission
   -o smtpd_tls_security_level=encrypt
   -o smtpd_tls_auth_only=yes
@@ -200,12 +199,11 @@ submission inet n       -       y       -       -       smtpd
   -o smtpd_sender_restrictions=reject_sender_login_mismatch
   -o smtpd_sender_login_maps=pcre:/etc/postfix/login_maps.pcre
   -o smtpd_recipient_restrictions=permit_sasl_authenticated,reject_unauth_destination
+
 smtps     inet  n       -       y       -       -       smtpd
   -o syslog_name=postfix/smtps
   -o smtpd_tls_wrappermode=yes
-  -o smtpd_sasl_auth_enable=yes
-spamassassin unix -     n       n       -       -       pipe
-  user=debian-spamd argv=/usr/bin/spamc -f -e /usr/sbin/sendmail -oi -f \${sender} \${recipient}" >> /etc/postfix/master.cf
+  -o smtpd_sasl_auth_enable=yes" >> /etc/postfix/master.cf
 
 # By default, dovecot has a bunch of configs in /etc/dovecot/conf.d/ These
 # files have nice documentation if you want to read it, but it's a huge pain to
@@ -264,6 +262,7 @@ namespace inbox {
 }
 	mailbox Trash {
 	special_use = \\Trash
+ 	autoexpunge = 30d
 }
 	mailbox Archive {
 	special_use = \\Archive
@@ -385,23 +384,6 @@ postconf -e 'smtpd_forbid_bare_newline_exclusions = $mynetworks'
 /lib/opendkim/opendkim.service.generate
 systemctl daemon-reload
 
-# Enable SpamAssassin update cronjob.
-if [ -f /etc/default/spamassassin ]
-then
-	sed -i "s|^CRON=0|CRON=1|" /etc/default/spamassassin
-	printf "Restarting spamassassin..."
-	service spamassassin restart && printf " ...done\\n"
-	systemctl enable spamassassin
-elif [ -f /etc/default/spamd ]
-then
-	sed -i "s|^CRON=0|CRON=1|" /etc/default/spamd
-	printf "Restarting spamd..."
-	service spamd restart && printf " ...done\\n"
-	systemctl enable spamd
-else
-	printf "!!! Neither /etc/default/spamassassin or /etc/default/spamd exists, this is unexpected and needs to be investigated"
-fi
-
 for x in opendkim dovecot postfix; do
 	printf "Restarting %s..." "$x"
 	service "$x" restart && printf " ...done\\n"
@@ -416,11 +398,11 @@ mxentry="$domain	MX	10	$maildomain	300"
 
 useradd -m -G mail postmaster
 
-# Create a cronjob that deletes month-old postmaster mails:
+# Create a cronjob that deletes 6 month-old postmaster mails:
 cat <<EOF > /etc/cron.weekly/postmaster-clean
 #!/bin/sh
 
-find /home/postmaster/Mail -type f -mtime +30 -name '*.mail*' -delete >/dev/null 2>&1
+find /home/postmaster/Mail -type f -mtime +180 -name '*.mail*' -delete >/dev/null 2>&1
 exit 0
 EOF
 chmod 755 /etc/cron.weekly/postmaster-clean
